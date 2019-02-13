@@ -5,7 +5,7 @@ library(shinydashboard);
 shinyUI(dashboardPage(
 
   
-  dashboardHeader(
+  dashboardHeader(title = "Eneriss ML demo"
  
                   
   ), # konec dashboardHeader
