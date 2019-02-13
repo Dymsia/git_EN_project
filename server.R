@@ -39,8 +39,21 @@ shinyServer(function(input,output,session){
   # Create table output in Data view tapPanel
   output$pre.data <- DT::renderDataTable( 
     
-    rawInputData()
-  
+    rawInputData(),
+    caption = "Dataset:",
+    #rownames = T,
+    filter = "top",
+    extensions = 'Buttons',
+    options = list(pageLength = 6, dom = 'Bfrtip',
+                   buttons = list('copy',
+                                  'print',
+                                  list(extend = 'collection',
+                                       buttons = c('csv', 'excel', 'pdf'),
+                                       text = 'Download'
+                                  )
+                   )
+                   
+    )
   )
   
   
