@@ -1,6 +1,6 @@
 require(shiny);
 library(shinydashboard);
-
+library(GGally)
 
 shinyUI(
   dashboardPage(
@@ -158,6 +158,11 @@ shinyUI(
                               actionButton("remove_button", "Remove"),
                               # Disable fading effect when processing
                               tags$style(".recalculating { opacity: 1; }")
+                              
+                     ),
+                     tabPanel(title = "Summary", solidHeader = TRUE,
+                              collapsible = TRUE,
+                              plotOutput("featurematrixUI")
                               
                      )
                      

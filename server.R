@@ -198,6 +198,33 @@ shinyServer(function(input,output,session){
   })
   
   
+  # generate correlation matrix
+  output$featurematrixUI = renderPlot({
+    data = rawInputData()
+    column = input$modelLabelUI;
+    
+    #check if the data is loaded first
+    if(is.null(data)){
+      return()
+    } else {
+      columnElement = which(colnames(data) == column);
+      
+      withProgress( 
+        message = 'Data analysis in progress',
+        detail = 'This may take a while...', value = 0, {
+          for (i in 1:15) {
+            incProgress(1/15)
+            Sys.sleep(0.25)
+            
+          }
+          
+        })
+      
+      ggpairs(data, mapping = ggplot2::aes_string(color = input$modelLabelUI))+ theme_bw()  
+    }
+  })
+  
+  
   ################## end interactive plots
   
   
