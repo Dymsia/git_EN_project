@@ -1,4 +1,6 @@
-
+require(caret)
+library(ggplot2)
+library(AppliedPredictiveModeling)
 
 shinyServer(function(input,output,session){
   
@@ -81,6 +83,31 @@ shinyServer(function(input,output,session){
       return(selectInput("modelPredictorVarsUI","Predictors variables:",colnames(data), selected=names(colnames(data))[-1], multiple=TRUE));
     }
   });
+  
+  #a feature plot using the caret package
+  
+  output$caretPlotUI = renderPlot({
+    data = rawInputData();
+    column = input$modelLabelUI;
+    
+    #check if the data is loaded first
+    if(is.null(data)){
+      return()
+    } else {
+      columnElement = which(colnames(data) == column);
+      
+      trellis.par.set(theme = col.whitebg(), warn = FALSE)
+      transparentTheme(trans = .4)
+      p = featurePlot(x=data[,-columnElement],
+                      y=data[,columnElement],
+                      plot="pairs",
+                      auto.key= TRUE,
+                      jitter =TRUE);
+      print(p);
+      
+      
+    }
+  })
   
   
   
