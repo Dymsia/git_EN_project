@@ -145,10 +145,21 @@ shinyUI(
                                           max = 30,
                                           value = 10),
                               downloadButton("report", "Generate report")
+                              ), # end tabPanel View data
+                     
+                     tabPanel(title = "Interactive plots", solidHeader = TRUE,
+                              collapsible = TRUE,
+                              # This will hold column dropdowns and "Add plot" button
+                              uiOutput("column_ui"),
+                              # This <div> will hold all of the plots we're going to
+                              # dynamically add. It's going to be super fun!
+                              div(id = "plot_container"),
+                              # knopka remove 
+                              actionButton("remove_button", "Remove"),
+                              # Disable fading effect when processing
+                              tags$style(".recalculating { opacity: 1; }")
                               
-                              
-                              
-                              ) # end tabPanel View data
+                     )
                      
                      
                      

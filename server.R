@@ -1,7 +1,7 @@
 require(caret)
 library(ggplot2)
 library(AppliedPredictiveModeling) # used in caret plot
-
+library(htmltools)
 shinyServer(function(input,output,session){
   
   ######################## 1. Eneriss Logo for Dashboard help item:
@@ -122,21 +122,84 @@ shinyServer(function(input,output,session){
     
     hist(x, breaks = bins, col = "#75AADB", border = "white",
          xlab = column,
-         main = "Histogram for numeric variables")
+         main = "Univariate distribution")
   })
   
   # responsible for selecting the num variable  for Histogram
   output$varSelectUI = renderUI({
     
     data = isolate(rawInputData());
-    data <- dplyr::select_if(data, is.numeric)
+    dataNum <- dplyr::select_if(data, is.numeric)
     #check if the data is loaded first
-    if(is.null(data)){
-      return(helpText("Choose a numeric variable"))
+    if(is.null(dataNum)){
+      return(helpText("Choose variable"))
     } else {
-      return(selectInput("modelNumVarUI","Select numeric Feature",colnames(data),colnames(data)[1]));
+      return(selectInput("modelNumVarUI","Select numeric Feature",colnames(dataNum),colnames(dataNum)[1]));
     }
   });
+  
+  ############### for interactives plots
+  # pick the dataset
+  dataset <- reactive({
+    eval(parse(text = input$rawInputData()))
+  })
+  
+  # Let user choose columns, and add plot.
+  output$column_ui <- renderUI({
+    choices <- c("Choose one" = "", names(rawInputData()))
+    tagList(
+      selectInput("xvar", "X variable", choices),
+      selectInput("yvar", "Y variable", choices),
+      conditionalPanel("input.xvar && input.yvar",
+                       actionButton("addplot", "Add plot")
+      )
+    )
+  })
+  
+  
+  # One of the very few times you'll see me create a non-reactive
+  # session-level variable, and mutate it from within an observer
+  plot_count <- 0
+  
+  # Add a plot when addplot is clicked
+  observeEvent(input$addplot, {
+    plot_count <<- plot_count + 1
+    
+    id <- paste0("plot", plot_count)
+    # Take a static snapshot of xvar/yvar; the renderPlot we're
+    # creating here cares only what their values are now, not in
+    # the future.
+    xvar <- input$xvar
+    yvar <- input$yvar
+    
+    output[[id]] <- renderPlot({
+      df <- brushedPoints(rawInputData(), input$brush, allRows = TRUE)
+      
+      ggplot(df, aes_string(xvar, yvar, color = "selected_")) +
+        geom_point(alpha = 0.6) +
+        scale_color_manual(values = c("black", "green", "red")) +
+        guides(color = FALSE) +
+        xlab(xvar) + ylab(yvar)
+    })
+    insertUI("#plot_container", where = "beforeEnd",
+             ui = div(style = css(display = "inline-block"),
+                      plotOutput(id, brush = "brush", width = 275, height = 275)
+             )
+    )
+  })
+  
+  
+  ## Remove Elements ###
+  observeEvent(input$remove_button, {
+    removeUI(
+      selector = paste0('#plot', plot_count)
+    )
+    plot_count <<- plot_count-1
+  })
+  
+  
+  ################## end interactive plots
+  
   
   
   }) # end shinyServer
