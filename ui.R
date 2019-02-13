@@ -92,18 +92,51 @@ shinyUI(
               
               tabBox(width = 12,
                      id = "datapreptab",
-                     tabPanel(title = "Data",
-                              solidHeader = TRUE,
+                     tabPanel(title = "Data", solidHeader = TRUE,
                               collapsible = TRUE,
                               flowLayout(
                                 fileInput('rawInputFile','Upload Data File',
                                           accept=c('text/csv',
                                                    'text/comma-separated-values,text/plain',
                                                    '.csv')
-                                )
-                                )
+                                ),
+                                
+                                checkboxInput('headerUI','Header',TRUE),
+                                uiOutput("labelSelectUI"),
+                                
+                                uiOutput("PredictorVarsUI"),
+                                
+                                splitLayout(
+                                  
+                                  
+                                  radioButtons('sepUI','Seperator',
+                                               c(Comma=',',
+                                                 Semicolon=';',
+                                                 Tab='\t'),
+                                               'Comma'),
+                                  
+                                  radioButtons('quoteUI','Quote',
+                                               c(None='',
+                                                 'Double Quote'='"',
+                                                 'Single Quote'="'"),
+                                               'Double Quote')
+                                ),
+                                
+                                
+                                
+                                plotOutput("caretPlotUI", width = "450px", height = "450px")
                               )
-                     )
+                              
+                     ), # end tabPanel Data
+                     
+                     tabPanel(title = "View data", solidHeader = TRUE,
+                              collapsible = TRUE,
+                              DT::dataTableOutput("pre.data")
+                              ) # end tabPanel View data
+                     
+                     
+                     
+                     ) # end tabBox
                      ) # end fluidPage Data Preparation
             
     ) # konec  tabItem datapreparation
