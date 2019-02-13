@@ -57,6 +57,33 @@ shinyServer(function(input,output,session){
   )
   
   
+  # responsible for selecting the label you want to clasify on
+  output$labelSelectUI = renderUI({
+    
+    data = rawInputData();
+    #check if the data is loaded first
+    if(is.null(data)){
+      return(helpText("Choose a file to load"))
+    } else {
+      return(selectInput("modelLabelUI","Select Target Feature",colnames(data),colnames(data)[1]));
+    }
+  });
+  
+  # responsible for selecting the exploratary variable
+  output$PredictorVarsUI = renderUI({
+    
+    data = rawInputData();
+    #check if the data is loaded first
+    if(is.null(data)){
+      return(helpText("Choose predictors"))
+    } else {
+      
+      return(selectInput("modelPredictorVarsUI","Predictors variables:",colnames(data), selected=names(colnames(data))[-1], multiple=TRUE));
+    }
+  });
+  
+  
+  
   }) # end shinyServer
 
 
