@@ -1,9 +1,7 @@
 
 
-shinyServer(function(input,output,session)
-{
+shinyServer(function(input,output,session){
   
   
   
-  
-}) # end shinyServer
+  }) # end shinyServer

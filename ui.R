@@ -28,6 +28,57 @@ shinyUI(
   
   dashboardBody(
     
+    ######################## 1. Dla Dashboard help item:
+    
+    tabItem(tabName = "dashboardhelp",
+            fluidRow(
+              box(title = "How To Use", status = "info", solidHeader = TRUE,
+                  collapsible = TRUE,collapsed = TRUE, width = 8,
+                  
+                  
+                  h4("Step 1: Data preparation"),
+                  tags$ol(
+                    tags$li("upload csv file"),
+                    tags$li("read the file"),
+                    tags$li("choose the target variable"),
+                    tags$li("see some EDA")
+                  ),
+                  
+                  
+                  h4("Step 2: Train ML model "),
+                  tags$ol(
+                    tags$li("basic tuning"),
+                    tags$li("set up cross-validation"),
+                    tags$li("choose pre-processing method"),
+                    tags$li("choose the model(s)"),
+                    tags$li("advanced hyperparameter tuning")
+                  ),
+                  
+                  h4("Step 3: Run Application"),
+                  h4("Step 3: Resalts"),
+                  tags$ol(
+                    tags$li("best results for each chosen model"),
+                    tags$li("train results"),
+                    tags$li("Accuracy plot")
+                  ),
+                  imageOutput("image2", width = "100%", height = "25px")
+              )
+              
+            ),  # konec 1-go fludRow
+            
+            #1_2. Libraries
+            fluidRow(
+              box(title = "Libraries/Dependencies",status = "info", solidHeader = TRUE,
+                  collapsible = TRUE,collapsed = TRUE, width = 8,
+                  h4("- The caret package "),
+                  h4("- Shiny Dashboard "),
+                  h4("- Google Cloud Platform(GCP)"),
+                  imageOutput("image3", width = "100%", height = "25px")
+              )
+            ) # konec 2-go fluid row Libraries
+            
+    ) # konec tabItem = dashboardhelp
+    
   ) # end dashboardBody
   
   ) # end dashboardPage()
