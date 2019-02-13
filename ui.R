@@ -131,7 +131,23 @@ shinyUI(
                      
                      tabPanel(title = "View data", solidHeader = TRUE,
                               collapsible = TRUE,
-                              DT::dataTableOutput("pre.data")
+                              DT::dataTableOutput("pre.data"),
+                              
+                              uiOutput("varSelectUI"),
+                              
+                              plotOutput("plotHist", height = 250),
+                              
+                              
+                              # Input: Slider for the number of bins ----
+                              sliderInput(inputId = "bins",
+                                          label = "Number of bins:",
+                                          min = 2,
+                                          max = 30,
+                                          value = 10),
+                              downloadButton("report", "Generate report")
+                              
+                              
+                              
                               ) # end tabPanel View data
                      
                      

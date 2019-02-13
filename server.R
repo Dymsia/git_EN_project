@@ -1,6 +1,6 @@
 require(caret)
 library(ggplot2)
-library(AppliedPredictiveModeling)
+library(AppliedPredictiveModeling) # used in caret plot
 
 shinyServer(function(input,output,session){
   
@@ -109,6 +109,34 @@ shinyServer(function(input,output,session){
     }
   })
   
+  output$plotHist <- renderPlot({
+    
+    datas = rawInputData()
+    
+    #grab the column
+    column = input$modelNumVarUI;
+    
+    columnElement = which(colnames(datas) == column);
+    x    <- datas[,columnElement]
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    hist(x, breaks = bins, col = "#75AADB", border = "white",
+         xlab = column,
+         main = "Histogram for numeric variables")
+  })
+  
+  # responsible for selecting the num variable  for Histogram
+  output$varSelectUI = renderUI({
+    
+    data = isolate(rawInputData());
+    data <- dplyr::select_if(data, is.numeric)
+    #check if the data is loaded first
+    if(is.null(data)){
+      return(helpText("Choose a numeric variable"))
+    } else {
+      return(selectInput("modelNumVarUI","Select numeric Feature",colnames(data),colnames(data)[1]));
+    }
+  });
   
   
   }) # end shinyServer
