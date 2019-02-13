@@ -29,7 +29,8 @@ shinyUI(
   dashboardBody(
     
     ######################## 1. Dla Dashboard help item:
-    
+    tabItems( # opredelaem dla kagdogo elementa  is siderBar menu BODY
+      
     tabItem(tabName = "dashboardhelp",
             fluidRow(
               box(title = "How To Use", status = "info", solidHeader = TRUE,
@@ -77,8 +78,37 @@ shinyUI(
               )
             ) # konec 2-go fluid row Libraries
             
-    ) # konec tabItem = dashboardhelp
+    ), # konec tabItem = dashboardhelp
     
+    ######################################
+    #2. Data Preparation Tab Contents
+    ######################################
+    
+    # Second tab content
+    tabItem(
+      tabName = "datapreparation",
+            
+            fluidPage(
+              
+              tabBox(width = 12,
+                     id = "datapreptab",
+                     tabPanel(title = "Data",
+                              solidHeader = TRUE,
+                              collapsible = TRUE,
+                              flowLayout(
+                                fileInput('rawInputFile','Upload Data File',
+                                          accept=c('text/csv',
+                                                   'text/comma-separated-values,text/plain',
+                                                   '.csv')
+                                )
+                                )
+                              )
+                     )
+                     ) # end fluidPage Data Preparation
+            
+    ) # konec  tabItem datapreparation
+    
+   )#konec tabItems()
   ) # end dashboardBody
   
   ) # end dashboardPage()

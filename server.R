@@ -14,4 +14,9 @@ shinyServer(function(input,output,session){
     return(list(src = "images/Eneriss_logo.png", contentType = "image/png", align = "center"))
   }, deleteFile = FALSE)
   
+  
+  
+  
   }) # end shinyServer
+
+
