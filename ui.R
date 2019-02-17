@@ -1,6 +1,21 @@
 require(shiny);
 library(shinydashboard);
 library(GGally)
+# comment
+require(shinyjs)
+require(shinyBS)
+require(DT)
+require(plotly)
+require(shinythemes)
+
+source("./helpers/helpers_ui.R", local = TRUE)$value
+
+ui.files = list.files(path = "./ui", pattern = "*.R")
+ui.files = paste0("ui/", ui.files)
+
+for (i in seq_along(ui.files)) {
+  source(ui.files[i], local = TRUE)
+}
 
 shinyUI(
   dashboardPage(
@@ -13,7 +28,8 @@ shinyUI(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Dashboard help", tabName = "dashboardhelp", icon = icon("dashboard")),
-      menuItem("Data Preparation", tabName = "datapreparation", icon = icon("wrench")),
+      menuItem("Data Preparation", tabName = "datapreparation", icon = icon("wrench")
+               ),
       menuItem("Train ML model(s)", tabName = "analysis", icon = icon("cogs"),
                menuSubItem("Train Control",icon = icon("cog"), tabName = "trainvalidation"),
                menuSubItem("Advanced tune",icon = icon("cog"), tabName = "algorithm")
@@ -92,47 +108,52 @@ shinyUI(
               
               tabBox(width = 12,
                      id = "datapreptab",
-                     tabPanel(title = "Data", solidHeader = TRUE,
-                              collapsible = TRUE,
-                              flowLayout(
-                                fileInput('rawInputFile','Upload Data File',
-                                          accept=c('text/csv',
-                                                   'text/comma-separated-values,text/plain',
-                                                   '.csv')
-                                ),
-                                
-                                checkboxInput('headerUI','Header',TRUE),
-                                uiOutput("labelSelectUI"),
-                                
-                                uiOutput("PredictorVarsUI"),
-                                
-                                splitLayout(
-                                  
-                                  
-                                  radioButtons('sepUI','Seperator',
-                                               c(Comma=',',
-                                                 Semicolon=';',
-                                                 Tab='\t'),
-                                               'Comma'),
-                                  
-                                  radioButtons('quoteUI','Quote',
-                                               c(None='',
-                                                 'Double Quote'='"',
-                                                 'Single Quote'="'"),
-                                               'Double Quote')
-                                ),
-                                
-                                
-                                
-                                plotOutput("caretPlotUI", width = "450px", height = "450px")
-                              )
-                              
-                     ), # end tabPanel Data
+                     
+                      tabPanel("Import", tabpanel.import,
+                               icon = icon("folder-open")),
+                      # tabPanel("DataOld", icon = icon("folder-open"),
+                      #          flowLayout(
+                      #            fileInput('rawInputFile','Upload Data File',
+                      #                      accept=c('text/csv',
+                      #                               'text/comma-separated-values,text/plain',
+                      #                               '.csv')
+                      #            ),
+                      # 
+                      #            checkboxInput('headerUI','Header',TRUE),
+                      #            uiOutput("labelSelectUI"),
+                      # 
+                      #           uiOutput("PredictorVarsUI"),
+                      # 
+                      #            splitLayout(
+                      # 
+                      # 
+                      #              radioButtons('sepUI','Seperator',
+                      #                           c(Comma=',',
+                      #                            Semicolon=';',
+                      #                             Tab='\t'),
+                      #                           'Comma'),
+                      # 
+                      #              radioButtons('quoteUI','Quote',
+                      #                           c(None='',
+                      #                             'Double Quote'='"',
+                      #                             'Single Quote'="'"),
+                      #                           'Double Quote')
+                      #            ),
+                      # 
+                      # 
+                      # 
+                      #            plotOutput("caretPlotUI", width = "450px", height = "450px")
+                      #          )
+                      # 
+                      # ), # end tabPanel Load data
+
+                     
                      
                      tabPanel(title = "View data", solidHeader = TRUE,
                               collapsible = TRUE,
                               DT::dataTableOutput("pre.data"),
-                              
+                              uiOutput("labelSelectUI"),
+                              plotOutput("caretPlotUI", width = "450px", height = "450px"),
                               uiOutput("varSelectUI"),
                               
                               plotOutput("plotHist", height = 250),
@@ -160,6 +181,66 @@ shinyUI(
                               tags$style(".recalculating { opacity: 1; }")
                               
                      ),
+                     
+                     tabPanel(title = "Preprocessing", solidHeader = TRUE,
+                              collapsible = TRUE,
+                              
+                             
+                             
+                             fluidRow( 
+                               box(width = 3, title = "Settings",
+                                   uiOutput("preproc_out"),
+                                   plotlyOutput("plot.feature.selection")
+                               ),
+                               tabBox(width = 9,
+                                      tabPanel(title = "Data",
+                                               dataTableOutput("preproc_data")
+                                      ),
+                                      tabPanel(title = "Statistics",
+                                               dataTableOutput("summary.datatable2")
+                                      )
+                               )
+                             ),
+                              selectInput("preproc_method", "",
+                                          choices = list("On data" = c("Drop variable(s)",
+                                                                       "Convert variable",
+                                                                       "Normalize variables",
+                                                                      # "Remove constant variables",
+                                                                       "Recode factor levels",
+                                                                       #"Cap large values",
+                                                                       #"Subset",
+                                                                       "Create dummy features"
+                                                                       #"Impute"
+                                                                       )
+                                                         
+                                                         ), selected = "Drop variable(s)"
+                                          ),
+                                br(),
+                               # tags$hr(),
+                               # br(),
+                              uiOutput("preproc.go"),
+                              br(),
+                             # tags$hr(),
+                              bsButton("preproc_undo", "undo", icon = icon("undo")),
+                             # tags$hr(),
+                              downloadButton("preproc.data.download", "save processed data")
+                              
+                              
+                              #DT::dataTableOutput("preproc_data")
+                            
+                              
+                              
+                              
+                     ),
+                     
+                     
+                     
+                     
+                     
+                     
+                     
+                     
+                     
                      tabPanel(title = "Summary", solidHeader = TRUE,
                               collapsible = TRUE,
                               plotOutput("featurematrixUI")
