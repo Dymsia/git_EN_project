@@ -72,7 +72,7 @@ shinyUI(
                   ),
                   
                   h4("Step 3: Run Application"),
-                  h4("Step 3: Resalts"),
+                  h4("Step 3: Results"),
                   tags$ol(
                     tags$li("best results for each chosen model"),
                     tags$li("train results"),
@@ -109,7 +109,7 @@ shinyUI(
               tabBox(width = 12,
                      id = "datapreptab",
                      
-                      tabPanel("Import", tabpanel.import,
+                      tabPanel("Import", tabpanel.import,  # tabpanel.import defined in ui/import.r
                                icon = icon("folder-open")),
                       # tabPanel("DataOld", icon = icon("folder-open"),
                       #          flowLayout(
@@ -234,14 +234,17 @@ shinyUI(
                      ),
                      
                      
+                     tabPanel("Summary", tabpanel.summary,
+                              icon = icon("bar-chart")
+                              
+                              ),
                      
                      
                      
                      
                      
                      
-                     
-                     tabPanel(title = "Summary", solidHeader = TRUE,
+                     tabPanel(title = "SummaryOLD", solidHeader = TRUE,
                               collapsible = TRUE,
                               plotOutput("featurematrixUI")
                               

@@ -94,6 +94,37 @@ shinyServer(function(input,output,session){
   caption = "You imported the following data set")
   
   
+  ###### vyvod summary uploaded dataset
+  output$data.summary.box = renderUI({
+    # if (input$show_help)
+    #   text = htmlOutput("summary.text")
+    # else
+    #   text = NULL
+    # 
+    # if (input$preproc_df == "training set")
+    #   title = "Data Summary of Training Set"
+    # else
+    #   title = "Data Summary of Test Set"
+    
+    title = "Summary of uploaded dataset"
+    ui = box(width = 12, title = title,
+            # text,
+             br(),
+             htmlOutput("data.summary.caption"),
+             DT::dataTableOutput("summary.datatable")
+    )
+    ui
+  })
+  
+  output$data.summary.caption = renderUI({
+    capt = sprintf("Your dataset contains %i observations. Click on one or more variables for visualisation!", nrow(data$data))
+    helpText(capt)
+  })
+  
+  
+
+  
+  
  ################ vyvod data prepoc_data 
   
   output$preproc_data = DT::renderDataTable({
@@ -478,7 +509,7 @@ shinyServer(function(input,output,session){
   
  ### konec help funkcii 
   
-  
+  #### dla tabPanel Summary
   
   
  
@@ -496,25 +527,25 @@ shinyServer(function(input,output,session){
   
   ######################## 2. Dla Data preparation item:
   #                           --------------------------
-  # reactive object, responsible for loading the main data
-  rawInputData = reactive({
-    
-    rawData = input$rawInputFile # tabPanel "Data"
-    headerTag = input$headerUI;
-    sepTag = input$sepUI;
-    quoteTag = input$quoteUI;
-    
-    
-    if(!is.null(rawData)) {
-      data = read.csv(rawData$datapath,
-                      header=headerTag,
-                      sep=sepTag,
-                      quote=quoteTag);
-    } else {
-      return(NULL);
-    }
-    
-  });
+  # # reactive object, responsible for loading the main data
+  # rawInputData = reactive({
+  #   
+  #   rawData = input$rawInputFile # tabPanel "Data"
+  #   headerTag = input$headerUI;
+  #   sepTag = input$sepUI;
+  #   quoteTag = input$quoteUI;
+  #   
+  #   
+  #   if(!is.null(rawData)) {
+  #     data = read.csv(rawData$datapath,
+  #                     header=headerTag,
+  #                     sep=sepTag,
+  #                     quote=quoteTag);
+  #   } else {
+  #     return(NULL);
+  #   }
+  #   
+  # });
   
   # Create table output in Data view tapPanel
   output$pre.data <- DT::renderDataTable( 

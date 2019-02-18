@@ -1,4 +1,4 @@
-tabpanel.summary = bootstrapPage(theme = shinytheme("united"),
+tabpanel.summary = bootstrapPage(theme = shinytheme("cerulean"),
   # fluidPage(
     uiOutput("data.summary.box"),
     box(width = 12, title = "Variable Visualization", id = "summary.vis.box",
