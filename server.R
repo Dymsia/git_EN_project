@@ -122,7 +122,12 @@ shinyServer(function(input,output,session){
   })
   
   
-
+  output$summary.datatable = DT::renderDataTable({
+    data.summary()
+  }, options = list(scrollX = TRUE))# , caption = capt)
+  
+  
+  ### blok dla visualizacii data summary
   
   
  ################ vyvod data prepoc_data 
