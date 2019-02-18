@@ -7,9 +7,6 @@ library(DT)
 
 require(tools)
 require(httr)
-require(mlr)
-require(stringi)
-require(readr)
 require(RWeka)
 require(BBmisc)
 require(checkmate)
@@ -20,6 +17,9 @@ require(ggplot2)
 require(DT)
 require(parallelMap)
 require(rmarkdown)
+require(mlr)
+require(stringi)
+require(readr)
 require(xtable)
 require(plyr)
 require(GGally)
@@ -261,8 +261,8 @@ shinyServer(function(input,output,session){
            "Recode factor levels" = c(preproc_recodelevels()),#  preproc_recodelevels_levels()),
           # "Cap large values" = preproc_caplarge(),
           # "Subset" = preproc_subset(),
-           "Create dummy features" = preproc_createdummy()
-          # "Impute" = preproc_impute(),
+           "Create dummy features" = preproc_createdummy(),
+           "Impute" = preproc_impute()
           # "Feature selection" = preproc_feature_selection(),
           # "Merge small factor levels" = preproc_merge_factor_levels()
     )
@@ -289,8 +289,8 @@ shinyServer(function(input,output,session){
                    "Recode factor levels" = "recode",
                   # "Cap large values" = "cap",
                    "Subset" = "subset",
-                   "Create dummy features" = "make dummies"
-                  # "Impute" = "impute",
+                   "Create dummy features" = "make dummies",
+                   "Impute" = "impute"
                    #"Feature selection" = "select features",
                    #"Merge small factor levels" = "merge factor levels"
     )
@@ -404,7 +404,7 @@ shinyServer(function(input,output,session){
     #   help = NULL
     makePreprocUI(
       # help,
-      selectInput("convar_cols", "Choose column",
+      selectInput("convar_cols", "Choose column", 
                   choices = as.list(colnames(d)), multiple = FALSE),
       selectInput("convar_type", "Convert to",
                   choices = c("numeric", "factor", "integer"))
@@ -445,18 +445,18 @@ shinyServer(function(input,output,session){
      # help,
       list(
         conditionalPanel("input.normfeat_cols == null",
-                         selectInput("normfeat_exclude", "Exclude column(s) (optional)", choices = choices, multiple = TRUE)
+                         selectInput("normfeat_exclude", "Exclude column(s) (optional)",width = '99%', choices = choices, multiple = TRUE)
         ),
         conditionalPanel("input.normfeat_exclude == null",
-                         selectInput("normfeat_cols", "Choose columns (optional)", choices = choices, multiple = TRUE)
+                         selectInput("normfeat_cols", "Choose columns (optional)",width = '99%', choices = choices, multiple = TRUE)
         )
       ),
       list(
-        selectInput("normfeat_method", "Choose method", selected = "standardize",
+        selectInput("normfeat_method", "Choose method", selected = "scale",
                     choices = c("center", "scale", "standardize", "range")),
         # FIXME What would be the best range?
         conditionalPanel("input.normfeat_method == 'range'",
-                         sliderInput("normfeat_range", "Choose range", min = -10L, max = 10L,
+                         sliderInput("normfeat_range", "Choose range",min = -10L, max = 10L,
                                      value = c(0, 1), round = TRUE, step = 1L)
         ),
         conditionalPanel("input.normfeat_method != 'center'",
@@ -513,7 +513,7 @@ shinyServer(function(input,output,session){
       # help,
       selectInput("recodelevels_col", "Choose factor to modify",
                   choices =  c("-",fnames), selected = col),
-      selectInput("recodelevels_method", "Choose method",
+      selectInput("recodelevels_method", "Choose method", 
                   choices =  c("Drop empty factor levels" = "drop", "Rename factor levels" = "recode",
                                "Define factor level as NA" = "findNA")),
       conditionalPanel("input.recodelevels_method == 'recode'",
@@ -619,11 +619,70 @@ shinyServer(function(input,output,session){
                                             method = input$createdummy_method, cols = input$createdummy_cols)
   })
 
+  ### Impute
   
+  preproc_impute = reactive({
+    req(input$preproc_method)
+    reqAndAssign(preproc.data$data, "d")
+    # if (input$show_help)
+    #   help = htmlOutput("impute.text")
+    # else
+    #   help = NULL
+    makePreprocUI(
+      # help,
+      list(
+        selectInput("impute_exclude", "Exclude column(s) (optional)",
+                    choices =  as.list(colnames(d)), multiple = TRUE),
+        selectInput("impute_methods_num", "Choose imputation method for numeric variables",
+                    selected = "imputeMean",
+                    choices = c("imputeConstant", "imputeMean", "imputeMedian",
+                                "imputeMode", "imputeMin", "imputeMax", "imputeNormal", "imputeHist")
+        ),
+        selectInput("impute_methods_fac", "Choose imputation method for factor variables", selected = "imputeMode",
+                    choices = c("imputeConstant", "imputeMode"))
+      ),
+      list(
+        conditionalPanel("input.impute_methods_num == 'imputeConstant'",
+                         numericInput("impute_constant_num_input", "Constant value for numerical features",
+                                      min = -Inf,  max = Inf, value = 0)
+        ),
+        conditionalPanel("input.impute_methods_fac == 'imputeConstant'",
+                         numericInput("impute_constant_fac_input", "Constant value for factors", min = -Inf,  max = Inf, value = 0)
+        )
+      )
+    )
+  })
+  
+  observeEvent(input$preproc_go, {
+    req(input$preproc_method == "Impute")
+    d = isolate(preproc.data$data)
+    reqAndAssign(input$impute_methods_num, "num")
+    reqAndAssign(input$impute_methods_fac, "fac")
+    
+    if (num == "imputeConstant" ) {
+      num_impute = imputeConstant(input$impute_constant_num_input)
+    } else {
+      num_impute = match.fun(num)()
+    }
+    
+    if (fac == "imputeConstant" ) {
+      fac_impute = imputeConstant(input$impute_constant_fac_input)
+    } else {
+      fac_impute = match.fun(fac)()
+    }
+    
+    imputed = impute(d, target = impute_target(), classes = list(numeric = num_impute, factor = fac_impute))
+    preproc.data$data = imputed$data
+  })
+  
+  impute_target = reactive({
+    tar = input$impute_exclude
+    ifelse(is.null(tar) | tar == "", character(0L), tar)
+  })
   
  ### konec help funkcii 
   
-  #### dla tabPanel Summary
+ 
   
   
  

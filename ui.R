@@ -183,7 +183,7 @@ shinyUI(
                      ),
                      
                      tabPanel(title = "Preprocessing", solidHeader = TRUE,
-                              collapsible = TRUE,
+                              collapsible = TRUE, icon = icon("wrench"),
                               
                              
                              
@@ -201,16 +201,16 @@ shinyUI(
                                       )
                                )
                              ),
-                              selectInput("preproc_method", "",
-                                          choices = list("On data" = c("Drop variable(s)",
+                              selectInput("preproc_method", "",  
+                                          choices = list("Choose one" = c("Drop variable(s)",
                                                                        "Convert variable",
                                                                        "Normalize variables",
                                                                       # "Remove constant variables",
                                                                        "Recode factor levels",
                                                                        #"Cap large values",
                                                                        #"Subset",
-                                                                       "Create dummy features"
-                                                                       #"Impute"
+                                                                       "Create dummy features",
+                                                                       "Impute"
                                                                        )
                                                          
                                                          ), selected = "Drop variable(s)"

@@ -165,7 +165,7 @@ makeResampleDescUI = function(rdesc.type) {
 makePreprocUI = function(help, ...) {
   confs = list(...)
   confs = lapply(confs, function(conf) {
-    column(6, conf)
+    column(9, conf)
   })
   list(fluidRow(help), fluidRow(confs))
 }

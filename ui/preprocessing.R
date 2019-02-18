@@ -26,7 +26,7 @@ tabpanel.preprocessing = fluidPage(theme = shinytheme("united"),
   )
   ),
   mainPanel(width = 9,
-    fluidRow(htmlOutput("preproc.text")),
+   # fluidRow(htmlOutput("preproc.text")),
     fluidRow(
         box(width = 12, title = "Settings",
           uiOutput("preproc_out"),
