@@ -167,6 +167,17 @@ shinyServer(function(input,output,session){
   
   summary.vis.out = reactive({
     reqAndAssign(summary.vis.var(), "feature")
+    withProgress( 
+      message = 'Plotting in progress',
+      detail = 'This may take a while...', value = 0, {
+        for (i in 1:5) {
+          incProgress(1/5)
+          Sys.sleep(0.015)
+          
+        }
+        
+      })
+    
     d = na.omit(data$data)
     reqNFeat(feature, d)
     barfill = "#3c8dbc"
@@ -178,14 +189,14 @@ shinyServer(function(input,output,session){
         summary.plot = ggplot(data = d, aes(x = x))
         
         if (density == "Density")
-          summary.plot = summary.plot + geom_density(fill = "blue", alpha = 0.1)
+          summary.plot = summary.plot + geom_density(fill = "pink", alpha = 0.7)
         else
           summary.plot = summary.plot + geom_histogram(colour = barlines, fill = barfill, stat = "bin", bins = input$summary.vis.hist.nbins)
         
         summary.plot = summary.plot + xlab(feature) +
-          geom_vline(aes(xintercept = quantile(x, 0.05)), color = "blue", size = 0.5, linetype = "dashed") +
-          geom_vline(aes(xintercept = quantile(x, 0.95)), color = "blue", size = 0.5, linetype = "dashed") +
-          geom_vline(aes(xintercept = quantile(x, 0.5)), color = "blue", size = 1, linetype = "dashed")
+          geom_vline(aes(xintercept = quantile(x, 0.05)), color = "black", size = 0.5, linetype = "dashed") +
+          geom_vline(aes(xintercept = quantile(x, 0.95)), color = "black", size = 0.5, linetype = "dashed") +
+          geom_vline(aes(xintercept = quantile(x, 0.5)), color = "red", size = 1, linetype = "dashed")
         summary.plot = addPlotTheme(summary.plot)
         summary.plot
       } else {
@@ -193,19 +204,19 @@ shinyServer(function(input,output,session){
         summary.plot = ggplot(data = d, aes(x = class)) + 
           geom_bar(aes(fill = class), stat = "count") + xlab(feature) +
           guides(fill = FALSE)
-        summary.plot = addPlotTheme(summary.plot)
+        summary.plot = addPlotTheme(summary.plot) 
         summary.plot
       }
     } else if (length(feature) > 1L) {
-      summary.plot = ggpairs(data = d, columns = feature,
-                             upper = list(continuous = wrap("cor", size = 10)), 
-                             lower = list(continuous = "smooth"))
+      summary.plot = ggpairs(data = d, columns = feature, mapping = ggplot2::aes_string(color = input$modelLabelUI),
+                             upper = list(continuous = wrap("cor", size = 5)), 
+                             lower = list(continuous = "smooth")) 
       summary.plot
     }
   })
   
   output$summary.vis = renderPlotly({
-    ggplotly(summary.vis.out())
+    ggplotly(summary.vis.out()) 
   })
   
   summary.vis.collection = reactiveValues(var.plots = NULL)#var.names = NULL, var.plots = NULL)

@@ -83,9 +83,9 @@ addPlotTheme = function(plot.obj) {
     panel.border = element_blank(),
     panel.background = element_blank(),
     plot.title = element_blank(),
-    axis.text.x = element_text(colour = "black", size = 9),
-    axis.title.x = element_text(vjust = 0.9),
-    axis.text.y = element_text(colour = "black", size = 9))
+    axis.text.x = element_text(colour = "black", size = 1),
+    axis.title.x = element_text(vjust = 0.5),
+    axis.text.y = element_text(colour = "black", size = 1))
   plot.obj + theme_bw() + plot.theme
 }
 
